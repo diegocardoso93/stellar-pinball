@@ -5,16 +5,16 @@
   
  ![startscreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/0startscreen.png?raw=true) ![gamescreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/1gamescreen.png?raw=true) ![scoreboardscreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/2scoreboardscreen.png?raw=true)
 
-A serverless pinball game built to the dev.to Stellar Challenge. 
+A serverless pinball game built to the dev.to Stellar Challenge.  
 The Scoreboard is stored inside an smart contract.
 
 ⚠ `this project is running on TestNet, is not audited and should not be used in a production environment.`
 
 # How to play
-Use the keys [spacebar] [A] [D]
+Use the keys `[spacebar]` `[A]` `[D]`  
 Visit this link to play [https://stellar-pinball.netlify.app](https://stellar-pinball.netlify.app)
 
-# Installation
+## [development] Installation
 
 1. Clone repository
 
@@ -40,7 +40,7 @@ npm run start
 
 4. Open [http://localhost:8000](http://localhost:8000) in your browser
 
-# Contract development
+## [development] Contract
 
 1. Follow tutorial to prepare smart contract dev environment [https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
 
