@@ -10,11 +10,11 @@ The Scoreboard is stored inside an smart contract.
 
 ⚠ `this project is running on TestNet, is not audited and should not be used in a production environment.`
 
-# How to play
+## How to play
 Use the keys `[spacebar]` `[A]` `[D]`  
 Visit this link to play [https://stellar-pinball.netlify.app](https://stellar-pinball.netlify.app)
 
-## [development] Installation
+### [dev] Installation
 
 1. Clone repository
 
@@ -35,31 +35,32 @@ npm i
 3. Start server
 
 ```
-npm run start
+npm run dev
 ```
 
-4. Open [http://localhost:8000](http://localhost:8000) in your browser
+4. Open [https://localhost:5173](http://localhost:5173) in your browser
 
-## [development] Contract
+### [dev] Contract
 
-1. Follow tutorial to prepare smart contract dev environment [https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
+1. Follow tutorial to prepare smart contract dev environment  
+[https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
 
 2. Go to Rust project
 ```
 cd contracts/scoreboard
 ```
 
-4. Test
+3. Test
 ```
 cargo test
 ```
 
-5. Build
+4. Build
 ```
 stellar contract build
 ```
 
-6. Deploy
+5. Deploy
 ```
 stellar contract deploy `
    --wasm .\target\wasm32-unknown-unknown\release\scoreboard.wasm `
@@ -67,7 +68,7 @@ stellar contract deploy `
    --network testnet
 ```
 
-7. Generate typescript bindings
+6. Generate typescript bindings
 ```
 stellar contract bindings typescript `
     --rpc-url https://soroban-testnet.stellar.org:443 `
@@ -77,4 +78,6 @@ stellar contract bindings typescript `
     --contract-id {previous-generated-contract-hash-here}
 ```
 
-<sub>Inspired by: [Almost all images are from https://www.freepik.com.](https://github.com/amandafager/pinball.git)</sub>   
+<sub>Inspired by: [https://github.com/amandafager/pinball.git](https://github.com/amandafager/pinball.git)</sub>   
+
+
