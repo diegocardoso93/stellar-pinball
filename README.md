@@ -1,20 +1,28 @@
-![pinballgame](https://user-images.githubusercontent.com/70512941/121678594-a4f0c300-cab7-11eb-8194-6b485cc29c27.gif)
-# Pinball
+# Stellar Pinball
+`#devchallenge #stellarchallenge #web3 #blockchain`
+![startscreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/0startscreen.png?raw=true)
+![gamescreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/1gamescreen.png?raw=true)
+![scoreboardscreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/2scoreboardscreen.png?raw=true)
 
-A desktop pinball game built with Phaser 3 - A 2D WebGL renderer with a built-in game engine. In this project we have used Matter plugin witch provides the ability to use the Matter JS Physics Engine.
+A serverless pinball game built to the dev.to Stellar Challenge.
+The Scoreboard is stored inside an smart contract.
 
-Visit link to play our pinball game [https://yrgo-pinball.netlify.app](https://yrgo-pinball.netlify.app/)
+⚠ `this project is running on TestNet, is not audited and should not be used in a production environment.`
+
+# How to play
+Use the keys [spacebar] [A] [D]
+Visit this link to play [https://stellar-pinball.netlify.app](https://stellar-pinball.netlify.app)
 
 # Installation
 
 1. Clone repository
 
 ```
-git clone https://github.com/amandafager/pinball.git
+git clone https://github.com/diegocardoso93/stellar-pinball.git
 ```
 
 ```
-cd path/to/project/folder/pinball
+cd stellar-pinball
 ```
 
 2. Install dependencies
@@ -29,70 +37,39 @@ npm i
 npm run start
 ```
 
-4. Open [http://localhost:8000 ](http://localhost:8000) in your browser
+4. Open [http://localhost:8000](http://localhost:8000) in your browser
 
-# Changelog
+# Contract development
 
-<details><summary>View changelog</summary>
+1. Follow tutorial to prepare smart contract dev environment [https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
 
-- [#1 - Project setup and game configuration.](https://github.com/danielmedb/pinball2.0/pull/1)
-- [#2 - Images for game objects and first object create class.](https://github.com/danielmedb/pinball2.0/pull/2)
-- [#3 - Removed pull request.](#3)
-- [#4 - Game ball functionality.](https://github.com/danielmedb/pinball2.0/pull/4)
-- [#5 - First draft of creating game objects with collision shape.](https://github.com/danielmedb/pinball2.0/pull/5)
-- [#6 - New object create class with collision shape and launcher class.](https://github.com/danielmedb/pinball2.0/pull/6)
-- [#7 - Game over and new game.](https://github.com/danielmedb/pinball2.0/pull/7)
-- [#8 - Flippers and update on launcher.](https://github.com/danielmedb/pinball2.0/pull/8)
-- [#9 - New images for game design.](https://github.com/danielmedb/pinball2.0/pull/9)
-- [#10 - Update in package.json.](https://github.com/danielmedb/pinball2.0/pull/10)
-- [#11 - Update in package.json. Testing deploy on Netlify.](https://github.com/danielmedb/pinball2.0/pull/11)
-- [#12 - Update objects physics shapes.](https://github.com/danielmedb/pinball2.0/pull/12)
-- [#13 - Score functionality and collision effect on bumpers.](https://github.com/danielmedb/pinball2.0/pull/13)
-- [#14 - Addition of game objects.](https://github.com/danielmedb/pinball2.0/pull/14)
-- [#15 - Left spring and audio on flippers.](https://github.com/danielmedb/pinball2.0/pull/15)
-- [#16 - Tailwind and welcome/end screen.](https://github.com/danielmedb/pinball2.0/pull/16)
-- [#17 - Updates on left spring and launcher spring.](https://github.com/danielmedb/pinball2.0/pull/17)
-- [#18 - Audio on more objects.](https://github.com/danielmedb/pinball2.0/pull/18)
-- [#19 - Testing text solution on brave browser.](https://github.com/danielmedb/pinball2.0/pull/19)
-- [#20 - Updated audio, bounce and closing pin.](https://github.com/danielmedb/pinball2.0/pull/20)
-- [#21 - Warnings, score and hit effects.](https://github.com/danielmedb/pinball2.0/pull/21)
-- [#22 - Comments, ball modifications.](https://github.com/danielmedb/pinball2.0/pull/22)
+2. Go to Rust project
+```
+cd contracts/scoreboard
+```
 
-</details>
+4. Test
+```
+cargo test
+```
 
-# Code Review
+5. Build
+```
+stellar contract build
+```
 
-By: [Aseel Mohamad](https://github.com/Aseel88) & [Dante Mogrim](https://github.com/dantemogrim):
+6. Deploy
+```
+stellar contract deploy `
+   --wasm .\target\wasm32-unknown-unknown\release\scoreboard.wasm `
+   --source alice `
+   --network testnet
+```
 
-1. `object.js` - Could have a more precise name or a comment that explains the content within 'object'.
-2. `GameScene.js` - The ball gets stuck sometimes in the upper left corner.
-3. `/dist` - Parcel loads in after 30 seconds. Some alterations or maybe a switch to another bundler could ease things up.
-4. `tailwind.css` - 3,6 MB in size. Site performance could be improved if you used something like NPM/Yarn to handle Tailwind instead.
-5. `GameScene.js:327` - This file could probably be shortened somehow. For example the content in preload and create could be buffered within another file perhaps. More classes could be another solution.
-6. `GameScene.js:156-157` - The 'score' and 'balls left' texts are a bit small on the eyes. Could be a bit bigger or maybe in CAPS? :wink:
-7. `launcher.js` Some clarifications could improve readability here. From the outside looking in, it can be a bit hard to grasp what certain things represent without doing detective work.
-8. Audio could be set the other way around - so off per default and if player in fact does want sound, then they can toggle it by pressing <kbd>P</kbd>.
-9. `greenDot.png` is weighing in on 1,2 MB. Compressing it would be good.
-10. `star.png` is also currently 1,2 MB in size. Could be reduced a bit.
+7. Generate typescript bindings
+```
+stellar contract bindings typescript --rpc-url https://soroban-testnet.stellar.org:443 --network-passphrase "Test SDF Network ; September 2015" --network testnet --output-dir packages/scoreboard --contract-id {generated-contract-hash-here}
+```
 
-> "Amazing work, you two! We were very impressed with what you've accomplished together. You should be proud! :star2: Nice touch with using JSON to render your sprites. Highly nostalgic! :heart_eyes_cat: " / Aseel & Dante
-
-# Testers
-
-Tested by the following people:
-
-1. Martin Hansson
-2. Rikard Segerkvist
-3. Moa Berg
-4. Gilda Eklöf
-
-Tested by the following muggles (non-coders):
-
-1. Mikael Hagberg Stenfelt
-2. Felicia Griph
-3. Amanda Ternblad
-4. Axel Carlsson
-
-# License
-
-This project is licensed under the MIT License - see the LICENSE file for details
+# Inspired by
+https://github.com/amandafager/pinball.git
