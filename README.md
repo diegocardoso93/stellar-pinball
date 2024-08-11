@@ -3,7 +3,7 @@
 `#devchallenge #stellarchallenge #web3 #blockchain`   
   
 A serverless pinball game built to the dev.to Stellar Challenge.  
-The Scoreboard is stored inside an smart contract.   
+The Scoreboard is stored inside an smart contract on Stellar Network. 🌌   
   
  ![startscreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/0startscreen.png?raw=true) ![gamescreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/1gamescreen.png?raw=true) ![writescorescreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/2writescorescreen.png?raw=true) ![scoreboardscreen](https://github.com/diegocardoso93/stellar-pinball/blob/main/prints/3scoreboardscreen.png?raw=true)
 
@@ -12,7 +12,7 @@ The Scoreboard is stored inside an smart contract.
 
 ## How to play
 Use the keys `[spacebar]` `[A]` `[D]`  
-To save your progress at the end of the game, use the Stellar Freighter Account on the Testnet.  
+To save your progress at the end of the game, use the Stellar Freighter Wallet on the Testnet.  
 Visit this link to play [https://stellar-pinball.netlify.app](https://stellar-pinball.netlify.app)
 
 ### [dev] Installation
