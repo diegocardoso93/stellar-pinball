@@ -12,6 +12,7 @@ The Scoreboard is stored inside an smart contract.
 
 ## How to play
 Use the keys `[spacebar]` `[A]` `[D]`  
+To save your progress at the end of the game, use the Stellar Freighter Account on the Testnet.  
 Visit this link to play [https://stellar-pinball.netlify.app](https://stellar-pinball.netlify.app)
 
 ### [dev] Installation
@@ -42,7 +43,7 @@ npm run dev
 
 ### [dev] Contract
 
-1. Follow tutorial to prepare smart contract dev environment  
+1. Follow this tutorial to prepare smart contract dev environment  
 [https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
 
 2. Go to Rust project
