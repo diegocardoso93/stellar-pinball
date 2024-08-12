@@ -1,8 +1,5 @@
 import Phaser from 'phaser';
-import WelcomeScene from './scenes/welcome';
-import ScoreboardScene from './scenes/scoreboard';
-import GameScene from './scenes/game';
-import EndGameScene from './scenes/end-game';
+import { WelcomeScene, GameScene, ScoreboardScene, EndGameScene } from './scenes';
 
 const config = {
   type: Phaser.AUTO,

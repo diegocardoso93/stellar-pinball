@@ -1,8 +1,8 @@
 {
-  "name": "pe",
+  "name": "stellar-pinball",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "A serverless pinball game built to the dev.to Stellar Challenge",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

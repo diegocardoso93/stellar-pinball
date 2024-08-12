@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
-import logo from '../assets/image/logo.png';
+
+import { logo, background, ballImage, spring, topDivider, spriteSheetPng } from '../assets/image';
+import { shapes, spriteSheetJson } from '../assets/data';
+import { soundTrigger, soundStart, soundBumperHit, soundLeftSpringLaunch, soundSmallBumper } from '../assets/audio';
 
 export default class WelcomeScene extends Phaser.Scene {
   constructor() {
@@ -7,7 +10,22 @@ export default class WelcomeScene extends Phaser.Scene {
   }
 
   preload() {
+    this.matter.world.update60Hz();
+
     this.load.image('logo', logo);
+    this.load.image('ball', ballImage);
+    this.load.image('background', background);
+    this.load.image('spring', spring);
+    this.load.image('topDivider', topDivider);
+
+    this.load.atlas('sheet', spriteSheetPng, spriteSheetJson);
+    this.load.json('shapes', shapes);
+
+    this.load.audio('triggerHit', soundTrigger);
+    this.load.audio('startGame', soundStart);
+    this.load.audio('bumperHit', soundBumperHit);
+    this.load.audio('leftSpringLaunch', soundLeftSpringLaunch);
+    this.load.audio('smallBumper', soundSmallBumper);
   }
 
   create() {

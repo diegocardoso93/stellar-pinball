@@ -1,5 +1,5 @@
-import { KeyboardKey, Sound } from "../types";
-import Ball from "./ball";
+import { KeyboardKey, Sound } from '../types';
+import Ball from './ball';
 
 export default class Launcher {
   scene: Phaser.Scene;
@@ -71,9 +71,7 @@ export default class Launcher {
       this.y * 0.54,
       this.sheet,
       this.texture,
-      {
-        shape: this.shapes,
-      }
+      { shape: this.shapes }
     );
 
     this.launchPaddleLock.setPosition(
@@ -113,7 +111,6 @@ export default class Launcher {
     this.ball.y = this.y - this.height / 2 - this.ball.height / 2;
     this.ball.setVelocity(0, 0);
     this.ball.setData('onStart', true);
-    
   }
 
   setBallVelocity(pushLevel: number) {
@@ -121,11 +118,8 @@ export default class Launcher {
     let vy;
 
     if (pushLevel <= 6) (vx = 0), (vy = -10);
-
     if (pushLevel >= 7 && pushLevel <= 10) (vx = 0), (vy = -20);
-
     if (pushLevel >= 11 && pushLevel <= 15) (vx = 0), (vy = -30);
-
     if (pushLevel >= 16) (vx = 10), (vy = -40);
 
     return { vx, vy };

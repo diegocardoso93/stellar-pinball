@@ -1,13 +1,7 @@
 import Phaser from 'phaser';
 import { networks, Client } from 'scoreboard';
 import { isAllowed, setAllowed, getUserInfo } from '@stellar/freighter-api';
-
-type ContractScores = [string, number[]];
-
-type PlayerScore = {
-  acc: string,
-  score: number
-}
+import { ContractScores, PlayerScore } from '../types';
 
 export default class ScoreboardScene extends Phaser.Scene {
   constructor() {

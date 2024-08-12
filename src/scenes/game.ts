@@ -1,33 +1,16 @@
 import Phaser from 'phaser';
 import config from '../main';
-import ObjectFactory from '../objects/object-factory';
-import Flipper from '../objects/flippers';
-import Launcher from '../objects/launcher';
-import Ball from '../objects/ball';
+import { ObjectFactory, Flipper, Launcher, Ball } from '../objects';
 import { CollidedObject } from '../types';
 
-import background from '../assets/image/background.png';
-import ballImage from '../assets/image/ball.png';
-import shapes from '../assets/data/physics.json';
-import sheetJson from '../assets/data/pinball-sprites.json';
-import sheetPng from '../assets/image/pinball-sprites.png';
-import spring from '../assets/image/spring.png';
-import topDivider from '../assets/image/topDivider.png';
-
-import soundTrigger from '../assets/audio/trigger.mp3';
-import soundStart from '../assets/audio/start.wav';
-import soundBumperHit from '../assets/audio/bumper-hit.wav';
-import soundLeftSpringLaunch from '../assets/audio/left-spring-launch.wav';
-import soundSmallBumper from '../assets/audio/small-bumpers.wav';
-
 export default class GameScene extends Phaser.Scene {
-  gameWidth: number;
-  gameHeight: number;
-  gameBalls: number;
-  score: number;
-  currentBall: number;
-  gameStarted: boolean;
-  dubbleScore: boolean;
+  gameWidth: number = config.scale.width;
+  gameHeight: number = config.scale.height;
+  gameBalls: number = 0;
+  score: number = 0;
+  currentBall: number = 0;
+  gameStarted: boolean = false;
+  dubbleScore: boolean = true;
   soundTriggers!: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
   soundStartGame!: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
   bumperHit!: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
@@ -43,51 +26,31 @@ export default class GameScene extends Phaser.Scene {
   scoreText!: Phaser.GameObjects.Text;
   ballsLeftText!: Phaser.GameObjects.Text;
   greenDotsGroup!: Phaser.GameObjects.Group;
+  leftFlipper!: Flipper;
+  rightFlipper!: Flipper;
 
   constructor() {
     super('GameScene');
-    this.gameWidth = config.scale.width;
-    this.gameHeight = config.scale.height;
-    this.gameBalls = 0;
-    this.score = 0;
-    this.currentBall = 0;
-    this.gameStarted = false;
-    this.dubbleScore = true; 
-  }
-
-  preload() {
-    this.matter.world.update60Hz();
-
-    this.load.image('ball', ballImage);
-    this.load.image('background', background);
-    this.load.image('spring', spring);
-    this.load.image('topDivider', topDivider);
-
-    this.load.atlas('sheet', sheetPng, sheetJson);
-    this.load.json('shapes', shapes);
-
-    this.load.audio('triggerHit', soundTrigger);
-    this.load.audio('startGame', soundStart);
-    this.load.audio('bumperHit', soundBumperHit);
-    this.load.audio('leftSpringLaunch', soundLeftSpringLaunch);
-    this.load.audio('smallBumper', soundSmallBumper);
   }
 
   create() {
-    this.soundTriggers = this.sound.add('triggerHit');
-    this.soundStartGame = this.sound.add('startGame');
-    this.bumperHit = this.sound.add('bumperHit');
-    this.leftSpringLaunch = this.sound.add('leftSpringLaunch');
-    this.soundSmallBumper = this.sound.add('smallBumper');
-
-    const shapes = this.cache.json.get('shapes') as any;
-
     this.matter.world.setBounds(0, 0, this.gameWidth, this.gameHeight);
     this.back = this.add.image(0, 0, 'background').setOrigin(0, 0);
     this.back.scale = 1.15;
     this.twoTimes = this.add.image(3, this.gameHeight - 150, 'sheet', '2x.png').setOrigin(0);
 
-    this.sound.mute = false;
+    this.createSoundObjects();
+    this.createGameObjects();
+    this.configureGameKeys();
+
+    this.addTextOnScene();
+    this.collisionListeners();
+
+    this.startGame();
+  }
+
+  createGameObjects() {
+    const shapes = this.cache.json.get('shapes') as any;
 
     new ObjectFactory(this, this.gameWidth - this.gameWidth * 0.17, this.gameHeight * 0.40, 'sheet', 'rightSmallBumper.png', { shape: shapes.rightSmallBumper });
     new ObjectFactory(this, this.gameWidth * 0.17, this.gameHeight * 0.40, 'sheet', 'leftSmallBumper.png', { shape: shapes.leftSmallBumper });
@@ -102,15 +65,17 @@ export default class GameScene extends Phaser.Scene {
     new ObjectFactory(this, this.gameWidth * 0.14, this.gameHeight * 0.744, 'sheet', 'leftRamp.png', { shape: shapes.leftRamp, restitution: 0 });
     new ObjectFactory(this, this.gameWidth - this.gameWidth * 0.14, this.gameHeight * 0.744, 'sheet', 'rightRamp.png', { shape: shapes.rightRamp, restitution: 0 });
     this.matter.add.image(this.gameWidth / 2, 100, 'topDivider', undefined, { isStatic: true, label: 'topDivider' });
-    const leftFlipper = new Flipper(this, this.gameWidth * 0.31, this.gameHeight * 0.87, 'left', shapes.leftTrigger, this.soundTriggers);
-    const rightFlipper = new Flipper(this, this.gameWidth * 0.68, this.gameHeight * 0.87, 'right', shapes.rightTrigger, this.soundTriggers);
+    this.leftFlipper = new Flipper(this, this.gameWidth * 0.31, this.gameHeight * 0.87, 'left', shapes.leftTrigger, this.soundTriggers);
+    this.rightFlipper = new Flipper(this, this.gameWidth * 0.68, this.gameHeight * 0.87, 'right', shapes.rightTrigger, this.soundTriggers);
 
     let leftSpringSensor = this.add.rectangle(25, this.gameHeight - 130, 60, 10);
     this.matter.add.gameObject(leftSpringSensor, { isSensor: true, isStatic: true, label: 'leftSpringSensor'});
     this.leftSpring = this.matter.add.image(this.gameWidth - this.gameWidth + 25, this.gameHeight - 30, 'spring', undefined, { isStatic: true, friction: 0, label: 'leftSpring' });
     this.leftSpringLock = this.matter.add.sprite(this.leftSpring.x + 8, this.leftSpring.y - 136,'sheet','closingPinLeft.png', { shape: shapes.closingPinLeft });
     this.launcher = new Launcher(this, this.gameWidth - 25, this.gameHeight - 40, 50, this.ball, 'spring', 'sheet', 'closingPinRight.png', shapes.closingPinRight, this.leftSpringLaunch);
+  }
 
+  configureGameKeys() {
     if (this.input.keyboard) {
       this.spacePushed = this.input.keyboard.addKey('space');
       this.spacePushed.enabled = false;
@@ -119,38 +84,41 @@ export default class GameScene extends Phaser.Scene {
       const muteSound = this.input.keyboard.addKey('P');
 
       muteSound.on('down', () => { this.sound.mute = !this.sound.mute }, this);
-      aPushed.on('down', () => { leftFlipper.flip(this.soundTriggers); }, this);
-      aPushed.on('up', () => { leftFlipper.release(); }, this);
-      dPushed.on('down', () => { rightFlipper.flip(this.soundTriggers);}, this);
-      dPushed.on('up', () => { rightFlipper.release(); }, this);
+      aPushed.on('down', () => { this.leftFlipper.flip(this.soundTriggers); }, this);
+      aPushed.on('up', () => { this.leftFlipper.release(); }, this);
+      dPushed.on('down', () => { this.rightFlipper.flip(this.soundTriggers);}, this);
+      dPushed.on('up', () => { this.rightFlipper.release(); }, this);
     }
+  }
 
+  createSoundObjects() {
+    this.soundTriggers = this.sound.add('triggerHit');
+    this.soundStartGame = this.sound.add('startGame');
+    this.bumperHit = this.sound.add('bumperHit');
+    this.leftSpringLaunch = this.sound.add('leftSpringLaunch');
+    this.soundSmallBumper = this.sound.add('smallBumper');
+    this.sound.mute = false;
+  }
+
+  startGame() {
     setTimeout(() => {
-      this.soundStartGame.play();
+      this.soundStartGame.play({ rate: 3 });
       this.newGame(); 
       this.gameStarted = true;
       this.spacePushed.enabled = true;
-    }, 2000)
-
-    this.addTextOnScene();
-    this.collisions();
+    }, 1000);
   }
 
   addTextOnScene() {
-    let scoreTextX; 
-    let scoreTextY; 
-    let ballsLeftTextX;
-    let ballsLeftTextY;  
-
-    scoreTextX = this.gameWidth * 0.03;
-    scoreTextY = 25;
-    ballsLeftTextX = this.gameWidth  * 0.73;
-    ballsLeftTextY= 25;
-    this.scoreText = this.add.text(scoreTextX, scoreTextY, 'Score: ' + this.score, { fontSize: 26 }).setOrigin(0).setDepth(1);
-    this.ballsLeftText = this.add.text(ballsLeftTextX , ballsLeftTextY, 'Balls left: ' + this.gameBalls, { fontSize: 26 }).setOrigin(0).setDepth(1);
+    this.scoreText = this.add.text(this.gameWidth * 0.03, 25, 'Score: ' + this.score, { fontSize: 26 })
+      .setOrigin(0)
+      .setDepth(1);
+    this.ballsLeftText = this.add.text(this.gameWidth  * 0.73 , 25, 'Balls left: ' + this.gameBalls, { fontSize: 26 })
+      .setOrigin(0)
+      .setDepth(1);
   }
 
-  newGame() {  
+  newGame() {
     this.currentBall = 0 
     this.gameBalls = 3;
     this.score = 0;
@@ -174,7 +142,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   resetBall() {
-    if (this.gameBalls >= 1 && this.ball.y > this.gameHeight - 20 ) {
+    if (this.gameBalls >= 1 && this.ball.y > this.gameHeight - 20) {
       this.gameBalls--;
       this.getNewBall();
       this.updateBallsLeftText();
@@ -189,17 +157,17 @@ export default class GameScene extends Phaser.Scene {
     } 
   } 
 
-  endGame(){
+  endGame() {
     this.spacePushed.enabled = false;
     this.gameStarted = false;
     this.ball.destroy();
     this.scene.start('EndGameScene', { score: this.score });
   }
 
-  collisions() {
+  collisionListeners() {
     this.matter.world.on('collisionstart', (_event: any, bodyA: CollidedObject, _bodyB: CollidedObject) => {
 
-      switch (bodyA.label){
+      switch (bodyA.label) {
 
         case 'sideSmallBumper':
         case 'sideBumper':
@@ -208,14 +176,14 @@ export default class GameScene extends Phaser.Scene {
         break;
 
         case 'launcher':
-          if (!this.ball.getData('onStart')){
+          if (!this.ball.getData('onStart')) {
             this.ball.setData('onStart', true);
             this.ball.setData('dead', true);
           }
         break;
 
         case 'leftSpring':
-          if(!this.ball.onLeftSpring){
+          if (!this.ball.onLeftSpring) {
             this.ball.onLeftSpring = true;
           }
         break;
@@ -233,13 +201,16 @@ export default class GameScene extends Phaser.Scene {
                 this.leftSpring.y + 2
               );
             }
-            if(this.leftSpring.y >= 1230){
+            if (this.leftSpring.y >= 1230) {
               let velocity = this.launcher.setBallVelocity(14);
               this.ball.updateVelocity(velocity.vx, velocity.vy);
               this.leftSpringLaunch.play();
               this.ball.onLeftSpring = false;
               setTimeout(() => {
-                this.leftSpringLock.setPosition(this.leftSpringLock.x -  (this.leftSpringLock.x - (this.leftSpringLock.width / 2)) , this.leftSpringLock.y); 
+                this.leftSpringLock.setPosition(
+                  this.leftSpringLock.x - (this.leftSpringLock.x - (this.leftSpringLock.width / 2)),
+                  this.leftSpringLock.y
+                );
               }, 300);
               clearInterval(launchLeftTimer);
             }
@@ -286,25 +257,25 @@ export default class GameScene extends Phaser.Scene {
   }
 
   updateScoreText() {
-    this.scoreText.text = 'Score: ' + this.score; 
+    this.scoreText.text = 'Score: ' + this.score;
   }
 
   updateBallsLeftText() {
-    this.ballsLeftText.text = 'Balls left: ' + this.gameBalls;  
+    this.ballsLeftText.text = 'Balls left: ' + this.gameBalls;
   }
 
   update() {
     if(this.gameStarted) {
       this.resetBall();
 
-      if(this.ball.y <= 15) {
+      if (this.ball.y <= 15) {
         this.ball.updateVelocity(0, 10);
         this.ball.setPosition(this.gameWidth * 0.2, this.gameHeight * 0.2);
       }
-      if(this.gameBalls === 0) {
+      if (this.gameBalls === 0) {
         this.endGame();
         this.newGame(); 
-      }  
-    } 
+      }
+    }
   }
 }
