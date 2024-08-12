@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import logo from '../images/logo.png';
+import logo from '../assets/image/logo.png';
 
 export default class WelcomeScene extends Phaser.Scene {
   constructor() {

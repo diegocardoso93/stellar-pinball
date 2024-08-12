@@ -6,3 +6,4 @@ test_snapshots
 .soroban
 
 node_modules
+/dist

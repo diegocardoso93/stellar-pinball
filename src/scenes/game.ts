@@ -1,22 +1,23 @@
 import Phaser from 'phaser';
 import config from '../main';
-import Launcher from '../assets/launcher';
-import background from '../images/background.png';
-import Ball from '../assets/ball';
-import ballImage from '../images/ball.png';
-import shapes from '../assets/physics.json';
-import sheetJson from '../assets/pinball-sprites.json';
-import sheetPng from '../images/pinball-sprites.png';
-import Object from '../assets/object';
-import Flipper from '../assets/flippers';
-import spring from '../images/spring.png';
-import topDivider from '../images/top_divider.png';
+import Launcher from '../objects/launcher';
+import background from '../assets/image/background.png';
+import Ball from '../objects/ball';
+import ballImage from '../assets/image/ball.png';
+import shapes from '../assets/data/physics.json';
+import sheetJson from '../assets/data/pinball-sprites.json';
+import sheetPng from '../assets/image/pinball-sprites.png';
+import ObjectFactory from '../objects/object-factory';
+import Flipper from '../objects/flippers';
+import spring from '../assets/image/spring.png';
+import topDivider from '../assets/image/topDivider.png';
 
-import soundTrigger from '../sounds/trigger.mp3';
-import soundStart from '../sounds/start.wav';
-import soundBumperHit from '../sounds/bumperHit.wav';
-import soundLeftSpringLaunch from '../sounds/leftSpringLaunch.wav';
-import soundSmallBumper from '../sounds/smallBumpers.wav';
+import soundTrigger from '../assets/audio/trigger.mp3';
+import soundStart from '../assets/audio/start.wav';
+import soundBumperHit from '../assets/audio/bumperHit.wav';
+import soundLeftSpringLaunch from '../assets/audio/leftSpringLaunch.wav';
+import soundSmallBumper from '../assets/audio/smallBumpers.wav';
+import { CollidedObject } from '../types';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -70,8 +71,6 @@ export default class GameScene extends Phaser.Scene {
     this.load.audio('bumperHit', soundBumperHit);
     this.load.audio('leftSpringLaunch', soundLeftSpringLaunch);
     this.load.audio('smallBumper', soundSmallBumper);
-
-    // this.load.pack('preload', './assets/pack.json', 'preload');
   }
 
   create() {
@@ -81,7 +80,7 @@ export default class GameScene extends Phaser.Scene {
     this.leftSpringLaunch = this.sound.add('leftSpringLaunch');
     this.soundSmallBumper = this.sound.add('smallBumper');
 
-    const shapes = this.cache.json.get('shapes') as Phaser.GameObjects.GameObject[];
+    const shapes = this.cache.json.get('shapes') as any;
 
     this.matter.world.setBounds(0, 0, this.gameWidth, this.gameHeight);
     this.back = this.add.image(0, 0, 'background').setOrigin(0, 0);
@@ -89,6 +88,28 @@ export default class GameScene extends Phaser.Scene {
     this.twoTimes = this.add.image(3, this.gameHeight - 150, 'sheet', '2x.png').setOrigin(0);
 
     this.sound.mute = false;
+
+    new ObjectFactory(this, this.gameWidth - this.gameWidth * 0.17, this.gameHeight * 0.40, 'sheet', 'rightSmallBumper.png', { shape: shapes.rightSmallBumper });
+    new ObjectFactory(this, this.gameWidth * 0.17, this.gameHeight * 0.40, 'sheet', 'leftSmallBumper.png', { shape: shapes.leftSmallBumper });
+    new ObjectFactory(this, this.gameWidth - 70, this.gameHeight - 70, 'sheet', 'blackDivider.png', { shape: shapes.blackDivider });
+    new ObjectFactory(this, 70, this.gameHeight - 70, 'sheet', 'blackDivider.png', { shape: shapes.blackDivider });
+    new ObjectFactory(this, this.gameWidth - ((800 * 0.5) + 2), 67, 'sheet', 'topHalfMoon.png', { shape: shapes.topHalfMoon, restitution: 0 });
+    new ObjectFactory(this, this.gameWidth * 0.35, 200, 'sheet', 'topBumper.png', { shape: shapes.topBumper });
+    new ObjectFactory(this, this.gameWidth * 0.5, 350, 'sheet', 'topBumper.png', { shape: shapes.topBumper });
+    new ObjectFactory(this, this.gameWidth * 0.65, 200, 'sheet', 'topBumper.png', { shape: shapes.topBumper });
+    new ObjectFactory(this, this.gameWidth * 0.25, this.gameHeight * 0.7, 'sheet', 'leftBumper.png', { shape: shapes.leftBumper });
+    new ObjectFactory(this, this.gameWidth - this.gameWidth * 0.25, this.gameHeight * 0.7, 'sheet', 'rightBumper.png', { shape: shapes.rightBumper });
+    new ObjectFactory(this, this.gameWidth * 0.14, this.gameHeight * 0.744, 'sheet', 'leftRamp.png', { shape: shapes.leftRamp, restitution: 0 });
+    new ObjectFactory(this, this.gameWidth - this.gameWidth * 0.14, this.gameHeight * 0.744, 'sheet', 'rightRamp.png', { shape: shapes.rightRamp, restitution: 0 });
+    this.matter.add.image(this.gameWidth / 2, 100, 'topDivider', undefined, { isStatic: true, label: 'topDivider' });
+    const leftFlipper = new Flipper(this, this.gameWidth * 0.31, this.gameHeight * 0.87, 'left', shapes.leftTrigger, this.soundTriggers);
+    const rightFlipper = new Flipper(this, this.gameWidth * 0.68, this.gameHeight * 0.87, 'right', shapes.rightTrigger, this.soundTriggers);
+
+    let leftSpringSensor = this.add.rectangle(25, this.gameHeight - 130, 60, 10);
+    this.matter.add.gameObject(leftSpringSensor, { isSensor: true, isStatic: true, label: 'leftSpringSensor'});
+    this.leftSpring = this.matter.add.image(this.gameWidth - this.gameWidth + 25, this.gameHeight - 30, 'spring', undefined, { isStatic: true, friction: 0, label: 'leftSpring' });
+    this.leftSpringLock = this.matter.add.sprite(this.leftSpring.x + 8, this.leftSpring.y - 136,'sheet','closingPinLeft.png', { shape: shapes.closingPinLeft });
+    this.launcher = new Launcher(this, this.gameWidth - 25, this.gameHeight - 40, 50, this.ball, 'spring', 'sheet', 'closingPinRight.png', shapes.closingPinRight, this.leftSpringLaunch);
 
     if (this.input.keyboard) {
       this.spacePushed = this.input.keyboard.addKey('space');
@@ -103,28 +124,6 @@ export default class GameScene extends Phaser.Scene {
       dPushed.on('down', () => { rightFlipper.flip(this.soundTriggers);}, this);
       dPushed.on('up', () => { rightFlipper.release(); }, this);
     }
-
-    const rightSmallBumper = new Object(this, this.gameWidth - this.gameWidth * 0.17, this.gameHeight * 0.40, 'sheet', 'rightSmallBumper.png', shapes.rightSmallBumper);
-    const leftSmallBumper = new Object(this, this.gameWidth * 0.17, this.gameHeight * 0.40, 'sheet', 'leftSmallBumper.png', shapes.leftSmallBumper);
-    const blackDividerRight = new Object(this, this.gameWidth - 70, this.gameHeight - 70, 'sheet', 'black_divider.png', shapes.black_divider);
-    const blackDividerLeft = new Object(this, 70, this.gameHeight - 70, 'sheet', 'black_divider.png', shapes.black_divider);
-    const topHalfMoon = new Object(this, this.gameWidth - ((800 * 0.5) + 2), 67, 'sheet', 'topHalfMoon.png', shapes.topHalfMoon);
-    const topBumperOne = new Object(this, this.gameWidth * 0.35, 200, 'sheet', 'topBumper.png', shapes.topBumper);
-    const topBumperTwo = new Object(this, this.gameWidth * 0.5, 350, 'sheet', 'topBumper.png', shapes.topBumper);
-    const topBumperThree = new Object(this, this.gameWidth * 0.65, 200, 'sheet', 'topBumper.png', shapes.topBumper);
-    const leftBumper = new Object(this, this.gameWidth * 0.25, this.gameHeight * 0.7, 'sheet', 'leftBumper.png', shapes.leftBumper);
-    const rightBumper = new Object(this, this.gameWidth - this.gameWidth * 0.25, this.gameHeight * 0.7, 'sheet', 'rightBumper.png', shapes.rightBumper);
-    const leftRamp = new Object(this, this.gameWidth * 0.14, this.gameHeight * 0.744, 'sheet', 'leftRamp.png', shapes.leftRamp);
-    const rightRamp = new Object(this, this.gameWidth - this.gameWidth * 0.14, this.gameHeight * 0.744, 'sheet', 'rightRamp.png', shapes.rightRamp);
-    const leftFlipper = new Flipper(this, this.gameWidth * 0.31, this.gameHeight * 0.87, 'left', shapes.leftTrigger, this.soundTriggers);
-    const rightFlipper = new Flipper(this, this.gameWidth * 0.68, this.gameHeight * 0.87, 'right', shapes.rightTrigger, this.soundTriggers);
-    const topDivider = this.matter.add.image(this.gameWidth / 2, 100, 'topDivider', null, { isStatic: true, label: 'topDivider' });
-
-    let leftSpringSensor = this.add.rectangle(25, this.gameHeight - 130, 60, 10);
-    this.matter.add.gameObject(leftSpringSensor, { isSensor: true, isStatic: true, label: 'leftSpringSensor'});
-    this.leftSpring = this.matter.add.image(this.gameWidth - this.gameWidth + 25, this.gameHeight - 30, 'spring', undefined, { isStatic: true, friction: 0, label: 'leftSpring'});
-    this.leftSpringLock = this.matter.add.sprite(this.leftSpring.x + 8, this.leftSpring.y - 136,'sheet','closingPinLeft.png',{shape: shapes.closingPinLeft,});
-    this.launcher = new Launcher(this, this.gameWidth - 25, this.gameHeight - 40, 50, this.ball, 'spring', 'sheet', 'closingPinRight.png', shapes.closingPinRight, this.leftSpringLaunch);
 
     setTimeout(() => {
       this.soundStartGame.play();
@@ -198,7 +197,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   collisions() {
-    this.matter.world.on('collisionstart', (_event: any, bodyA: Object, _bodyB: Object) => {
+    this.matter.world.on('collisionstart', (_event: any, bodyA: CollidedObject, _bodyB: CollidedObject) => {
 
       switch (bodyA.label){
 
@@ -261,7 +260,7 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
-    this.matter.world.on('collisionend', (_event, bodyA, _bodyB) => {
+    this.matter.world.on('collisionend', (_event: any, bodyA: CollidedObject, _bodyB: CollidedObject) => {
       if (bodyA.label === 'leftSpring') {
         if (this.dubbleScore) {
           this.score = this.score * 2;

@@ -1,8 +1,10 @@
+import GameScene from "../scenes/game";
+import { Sound } from "../types";
 
-export default class Flipper extends Phaser.Scene {
-  x: any;
-  y: any;
-  orientation: any;
+export default class Flipper {
+  x: number;
+  y: number;
+  orientation: string;
   shapes: any;
   blockOffsetX: number;
   blockOffsetY: number;
@@ -14,16 +16,16 @@ export default class Flipper extends Phaser.Scene {
   startPosition: number;
   endPosition: number;
   isFlipping: boolean;
-  soundTrigger: any;
+  soundTrigger: Sound;
   block: any;
   pivot: any;
   flipperBody: any;
   flipper: any;
   pin: any;
   pistonPin: any;
+  scene: GameScene;
 
-  constructor(scene, x: number, y: number, orientation: string, shapes: any, soundTrigger: any) {
-    super(scene);
+  constructor(scene: GameScene, x: number, y: number, orientation: string, shapes: any, soundTrigger: Sound) {
     this.scene = scene;
     this.x = x;
     this.y = y;
@@ -55,8 +57,9 @@ export default class Flipper extends Phaser.Scene {
     this.block.visible = false;
 
     this.pivot = this.scene.matter.add.rectangle(this.x, this.y, 10, 10, { isStatic: true, circleRadius: 1 });
-    
-    let rectA = Phaser.Physics.Matter.Matter.Bodies.rectangle(this.x + this.flipperOffsetX , this.y + this.flipperOffsetY, this.flipperLength, this.flipperWidth, {
+
+    // @ts-ignore
+    let rectA = window.Phaser.Physics.Matter.Matter.Bodies.rectangle(this.x + this.flipperOffsetX , this.y + this.flipperOffsetY, this.flipperLength, this.flipperWidth, {
       chamfer: 0,
     })
 
@@ -128,7 +131,7 @@ export default class Flipper extends Phaser.Scene {
     }
   }
 
-  flip(soundTriggers) {
+  flip(soundTriggers: Sound) {
     soundTriggers.play();
     this.isFlipping = true
     this.scene.tweens.add({
