@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { networks, Client } from 'scoreboard';
-import { isAllowed, setAllowed, getUserInfo, signTransaction } from '@stellar/freighter-api';
+import { isAllowed, setAllowed, getUserInfo, signTransaction, isConnected } from '@stellar/freighter-api';
 
 export default class EndGameScene extends Phaser.Scene {
   private score!: string;
@@ -21,12 +21,17 @@ export default class EndGameScene extends Phaser.Scene {
     this.add.rectangle(400, 500, 500, 200, 0xffffff);
 
     this.add.text(270, 440, `YOUR SCORE:`, {fontSize: '40px', color: 'black', fontStyle: 'bold'});
-    this.add.text(330, 500, this.score || '12300', {fontSize: '40px', color: 'black', fontStyle: 'bold'});
+    this.add.text(330, 500, this.score || '0', {fontSize: '40px', color: 'black', fontStyle: 'bold'});
 
     this.drawWriteScoreButton();
   }
 
   async writeScore() {
+    if (!await isConnected()) {
+      alert('Please connect with your Freighter Wallet Account!');
+      return;
+    }
+
     if (!await isAllowed()) {
       await setAllowed();
     }

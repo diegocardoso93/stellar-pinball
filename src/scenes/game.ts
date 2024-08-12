@@ -1,24 +1,24 @@
 import Phaser from 'phaser';
 import config from '../main';
+import ObjectFactory from '../objects/object-factory';
+import Flipper from '../objects/flippers';
 import Launcher from '../objects/launcher';
-import background from '../assets/image/background.png';
 import Ball from '../objects/ball';
+import { CollidedObject } from '../types';
+
+import background from '../assets/image/background.png';
 import ballImage from '../assets/image/ball.png';
 import shapes from '../assets/data/physics.json';
 import sheetJson from '../assets/data/pinball-sprites.json';
 import sheetPng from '../assets/image/pinball-sprites.png';
-import ObjectFactory from '../objects/object-factory';
-import Flipper from '../objects/flippers';
 import spring from '../assets/image/spring.png';
 import topDivider from '../assets/image/topDivider.png';
 
 import soundTrigger from '../assets/audio/trigger.mp3';
 import soundStart from '../assets/audio/start.wav';
-import soundBumperHit from '../assets/audio/bumperHit.wav';
-import soundLeftSpringLaunch from '../assets/audio/leftSpringLaunch.wav';
-import soundSmallBumper from '../assets/audio/smallBumpers.wav';
-import { CollidedObject } from '../types';
-
+import soundBumperHit from '../assets/audio/bumper-hit.wav';
+import soundLeftSpringLaunch from '../assets/audio/left-spring-launch.wav';
+import soundSmallBumper from '../assets/audio/small-bumpers.wav';
 
 export default class GameScene extends Phaser.Scene {
   gameWidth: number;

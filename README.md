@@ -13,7 +13,7 @@ The Scoreboard is stored inside an smart contract on Stellar Network. 🌌
 ## How to play
 Use the keys `[spacebar]` `[A]` `[D]`  
 To save your progress at the end of the game, use the Stellar Freighter Wallet on the Testnet.  
-Visit this link to play [https://stellar-pinball.netlify.app](https://stellar-pinball.netlify.app)
+Visit this link to play [https://stellar-pinball.pages.dev/](https://stellar-pinball.pages.dev/)
 
 ### [dev] Installation
 
