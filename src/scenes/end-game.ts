@@ -28,7 +28,7 @@ export default class EndGameScene extends Phaser.Scene {
 
   async writeScore() {
     if (!await isConnected()) {
-      alert('Please connect with your Freighter Wallet Account!');
+      alert('Please connect with your Freighter Wallet!');
       return;
     }
 
@@ -38,6 +38,10 @@ export default class EndGameScene extends Phaser.Scene {
 
     if (await isAllowed()) {
       const { publicKey } = await getUserInfo();
+      if (!publicKey) {
+        alert('Please log in to your Freighter Wallet on the Test Net.');
+        return;
+      }
       let scoreboard = new Client({
         rpcUrl: 'https://soroban-testnet.stellar.org:443',
         ...networks.testnet
