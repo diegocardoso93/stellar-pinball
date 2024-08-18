@@ -31,7 +31,7 @@ export default class ScoreboardScene extends Phaser.Scene {
 
     const [scoreboards, publicKey] = await this.readScoreboard();
     const accountsTopScore = scoreboards.map(([acc, scores]: ContractScores) => ({acc, score: Math.max(...scores)}));
-    accountsTopScore.sort((a: PlayerScore, b: PlayerScore) => a.score - b.score > 0);
+    accountsTopScore.sort((a: PlayerScore, b: PlayerScore) => b.score - a.score);
 
     const [bx, by] = [80, 330];
     for (let y = 0; y < 50 * 15; y += 50) {
